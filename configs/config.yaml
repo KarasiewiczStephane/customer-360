@@ -1,0 +1,32 @@
+data:
+  num_customers: 10000
+  num_transactions: 500000
+  num_web_sessions: 100000
+  num_support_tickets: 20000
+  sample_customers: 1000
+  seed: 42
+
+database:
+  path: "data/customer360.duckdb"
+
+resolution:
+  match_threshold: 0.85
+  uncertain_threshold: 0.6
+  blocking_fields:
+    - "first_letter_name"
+    - "zip_code"
+  source_priority:
+    - "crm"
+    - "transactions"
+    - "web"
+    - "support"
+
+analytics:
+  rfm_segments: 5
+  kmeans_max_clusters: 10
+  clv_prediction_months: 12
+  clv_discount_rate: 0.01
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
