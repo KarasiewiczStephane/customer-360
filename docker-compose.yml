@@ -1,0 +1,23 @@
+services:
+  pipeline:
+    build:
+      context: .
+      target: pipeline
+    volumes:
+      - pipeline-data:/app/data
+    command: ["python", "-m", "src.main"]
+
+  dashboard:
+    build:
+      context: .
+      target: dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - pipeline-data:/app/data
+    depends_on:
+      pipeline:
+        condition: service_completed_successfully
+
+volumes:
+  pipeline-data:

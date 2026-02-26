@@ -1,4 +1,5 @@
-.PHONY: install test lint clean run pipeline pipeline-sample dashboard docker
+.PHONY: install test lint clean run pipeline pipeline-sample dashboard \
+       docker-build docker-pipeline docker-dashboard docker-up docker-down
 
 install:
 	pip install -r requirements.txt
@@ -26,6 +27,18 @@ dashboard:
 
 run: pipeline
 
-docker:
-	docker build -t $(shell basename $(CURDIR)) .
-	docker run -p 8000:8000 $(shell basename $(CURDIR))
+docker-build:
+	docker build --target pipeline -t customer-360-pipeline .
+	docker build --target dashboard -t customer-360-dashboard .
+
+docker-pipeline:
+	docker run --rm -v customer360-data:/app/data customer-360-pipeline
+
+docker-dashboard:
+	docker run --rm -p 8501:8501 -v customer360-data:/app/data customer-360-dashboard
+
+docker-up:
+	docker compose up --build
+
+docker-down:
+	docker compose down -v
