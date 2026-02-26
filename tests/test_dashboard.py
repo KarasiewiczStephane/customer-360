@@ -65,3 +65,39 @@ class TestSafeQuery:
             ["%alice%"],
         )
         assert len(result) == 1
+
+    def test_empty_params_uses_no_params_path(self, conn: duckdb.DuckDBPyConnection) -> None:
+        result = _safe_query(conn, "SELECT * FROM golden_records", params=[])
+        assert len(result) == 1
+
+    def test_none_params_uses_no_params_path(self, conn: duckdb.DuckDBPyConnection) -> None:
+        result = _safe_query(conn, "SELECT * FROM golden_records", params=None)
+        assert len(result) == 1
+
+    def test_rfm_query(self, conn: duckdb.DuckDBPyConnection) -> None:
+        result = _safe_query(
+            conn,
+            "SELECT segment, COUNT(*) AS customer_count, AVG(monetary) AS avg_monetary "
+            "FROM rfm_scores GROUP BY segment",
+        )
+        assert len(result) == 1
+        assert result.iloc[0]["segment"] == "Champions"
+
+    def test_clv_query(self, conn: duckdb.DuckDBPyConnection) -> None:
+        result = _safe_query(conn, "SELECT predicted_clv, clv_tier FROM clv_predictions")
+        assert len(result) == 1
+        assert result.iloc[0]["clv_tier"] == "High Value"
+
+    def test_join_query(self, conn: duckdb.DuckDBPyConnection) -> None:
+        result = _safe_query(
+            conn,
+            "SELECT g.unified_id, g.name, r.segment, c.predicted_clv "
+            "FROM golden_records g "
+            "LEFT JOIN rfm_scores r ON g.unified_id = r.customer_id "
+            "LEFT JOIN clv_predictions c ON g.unified_id = c.customer_id "
+            "WHERE g.unified_id = ?",
+            ["GOLD_000001"],
+        )
+        assert len(result) == 1
+        assert result.iloc[0]["name"] == "Alice Smith"
+        assert result.iloc[0]["segment"] == "Champions"

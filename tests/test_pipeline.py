@@ -1,10 +1,12 @@
 """Tests for the end-to-end pipeline orchestration."""
 
+from unittest.mock import patch
+
 import duckdb
 import pandas as pd
 import pytest
 
-from src.main import _flatten_retention_matrix, run_pipeline
+from src.main import _flatten_retention_matrix, main, run_pipeline
 
 
 @pytest.fixture()
@@ -124,3 +126,17 @@ class TestFlattenRetentionMatrix:
         result = _flatten_retention_matrix(matrix)
 
         assert len(result) == 3
+
+
+class TestMainCLI:
+    def test_main_with_args(self, config_file: tuple[str, str]) -> None:
+        """CLI entry point parses args and runs pipeline."""
+        config_path, _ = config_file
+        with patch("sys.argv", ["src.main", "--config", config_path, "--sample"]):
+            main()
+
+    def test_main_default_args(self, config_file: tuple[str, str]) -> None:
+        """CLI entry point works with config override."""
+        config_path, _ = config_file
+        with patch("sys.argv", ["src.main", "--config", config_path]):
+            main()
