@@ -1,4 +1,4 @@
-.PHONY: install test lint clean run docker
+.PHONY: install test lint clean run pipeline pipeline-sample dashboard docker
 
 install:
 	pip install -r requirements.txt
@@ -13,9 +13,18 @@ lint:
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
+	rm -f data/customer360.duckdb
 
-run:
+pipeline:
 	python -m src.main
+
+pipeline-sample:
+	python -m src.main --sample
+
+dashboard:
+	streamlit run src/dashboard/app.py
+
+run: pipeline
 
 docker:
 	docker build -t $(shell basename $(CURDIR)) .
