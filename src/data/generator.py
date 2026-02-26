@@ -126,6 +126,91 @@ class SyntheticDataGenerator:
         return df
 
     # ------------------------------------------------------------------
+    # Web sessions
+    # ------------------------------------------------------------------
+
+    REFERRERS = ["google", "facebook", "direct", "email", "linkedin", "twitter", None]
+    PAGES = ["home", "products", "pricing", "about", "contact", "checkout", "blog"]
+
+    def generate_web_sessions(self, customer_ids: list[str], n: int | None = None) -> pd.DataFrame:
+        """Generate web behaviour session records.
+
+        Args:
+            customer_ids: Valid customer IDs to sample from.
+            n: Number of sessions. Defaults to config value.
+
+        Returns:
+            DataFrame with web session records (~10 % anonymous).
+        """
+        if n is None:
+            n = self.config["data"]["num_web_sessions"]
+        logger.info("Generating %d web session records …", n)
+
+        sessions: list[dict[str, Any]] = []
+        for i in range(n):
+            cust_id = random.choice(customer_ids) if random.random() < 0.9 else None
+            sessions.append(
+                {
+                    "session_id": f"SES_{i:08d}",
+                    "customer_id": cust_id,
+                    "timestamp": self.fake.date_time_between(start_date="-1y", end_date="now"),
+                    "pages_visited": random.randint(1, 20),
+                    "time_on_site": random.randint(10, 1800),
+                    "referrer": random.choice(self.REFERRERS),
+                    "pages_path": ",".join(random.choices(self.PAGES, k=random.randint(1, 8))),
+                }
+            )
+
+        df = pd.DataFrame(sessions)
+        logger.info("Created %d web session records", len(df))
+        return df
+
+    # ------------------------------------------------------------------
+    # Support tickets
+    # ------------------------------------------------------------------
+
+    TICKET_CATEGORIES = ["Billing", "Technical", "Account", "Product", "Returns", "Other"]
+
+    def generate_support_tickets(
+        self, customer_ids: list[str], n: int | None = None
+    ) -> pd.DataFrame:
+        """Generate support ticket records.
+
+        Args:
+            customer_ids: Valid customer IDs to sample from.
+            n: Number of tickets. Defaults to config value.
+
+        Returns:
+            DataFrame with support ticket records.
+        """
+        if n is None:
+            n = self.config["data"]["num_support_tickets"]
+        logger.info("Generating %d support ticket records …", n)
+
+        tickets: list[dict[str, Any]] = []
+        for i in range(n):
+            resolution_hours = random.expovariate(1 / 24)
+            tickets.append(
+                {
+                    "ticket_id": f"TKT_{i:06d}",
+                    "customer_id": random.choice(customer_ids),
+                    "created_at": self.fake.date_time_between(start_date="-2y", end_date="now"),
+                    "category": random.choice(self.TICKET_CATEGORIES),
+                    "resolution_time_hours": round(resolution_hours, 2),
+                    "satisfaction_score": random.choices(
+                        [1, 2, 3, 4, 5], weights=[5, 10, 20, 35, 30]
+                    )[0],
+                    "status": random.choice(
+                        ["resolved", "resolved", "resolved", "open", "pending"]
+                    ),
+                }
+            )
+
+        df = pd.DataFrame(tickets)
+        logger.info("Created %d support ticket records", len(df))
+        return df
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
