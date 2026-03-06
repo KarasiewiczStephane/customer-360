@@ -3,6 +3,7 @@
 
 install:
 	pip install -r requirements.txt
+	pip install -e .
 
 test:
 	pytest tests/ -v --tb=short --cov=src
