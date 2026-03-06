@@ -38,3 +38,4 @@ Thumbs.db
 
 # Task Master (keep local)
 .taskmaster/
+.coverage
