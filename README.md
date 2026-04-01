@@ -1,6 +1,6 @@
 # customer-360
 
-> Part of my Data Science Portfolio — [Skaraz Data](https://github.com/YOUR_USERNAME)
+> Customer 360 analytics platform — unified customer view with segmentation, lifetime value prediction, and interactive dashboards.
 
 ## Overview
 
@@ -51,6 +51,11 @@ customer-360/
 ## Results
 
 TODO: Add metrics and results
+
+
+## Author
+
+**Stéphane Karasiewicz** — [skarazdata.com](https://skarazdata.com) | [LinkedIn](https://www.linkedin.com/in/stephane-karasiewicz/)
 
 ## License
 
